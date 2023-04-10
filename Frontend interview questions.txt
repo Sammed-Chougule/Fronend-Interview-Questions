@@ -1,0 +1,220 @@
+﻿Frontend interview questions
+
+
+1. Diff between map and foreach ➖ both are array functions to loop through array function map doesn't harm the original array it creates a separate array by performing the operation but foreach makes changes to the original array. And as the map creates another array so we can chain other functions to map like a filter, reduce etc.
+eg. const ans = arr.map((e)=>{
+        Return e+2;
+})
+Const foreach = arr.foreach((e)=>{
+        Return e+2;
+})
+
+
+2. Diff between null and undefined:- as null is the value(type -object) and undefined is the value declared but not initialised.
+ (null == undefined)  = true[it check only value]
+ (null===undefined) = false[it chack value as well as type]
+
+
+3. Flatten the array:-  let arr = [  [1,2], [4,3,2],[8,9,0] ] for single depth we can do 
+[].concat(...arr). I will give the array. [].flat(depth of array);For multilevel [].flat(Infinity).
+
+
+4. Let vs const vs var:- var is globally scoped and let const are block scoped. you can redeclare var but not const and let.
+
+
+5. setTimeout related:- 
+function temp (){
+for(let i =0;i<5;i++){
+   setTimeout( function a(){
+           console.log(i);
+   },i*1000)
+   }
+}
+
+
+temp();
+For let = 0,1,2,3,4  for var = 5,5,5,5,5; as let have block scope and var has global scope so it references to global scope value at last.
+
+function temp (){
+for(let i =0;i<5;i++){
+        function b(i){
+   setTimeout( function a(){
+           console.log(i);
+   },i*1000)
+   } b(i);}} temp(); it will print the correct value.
+
+
+6.  Explain call, apply and bind:-  
+let person = {
+                name: "sammed", 
+            hello: function (word){
+            console.log("welcome " + this.name+ " and "+word);
+            }  
+}
+let another = {
+name: "Rakesh"
+}
+We provide the context to reference which it has to take. bind return function after taking   the context we can provide the argument for value afterwards.
+
+
+person.hello.call(another , "hi");
+person.hello.call(another,[“hi”]);
+Const temp = person.hello.bind(another);
+temp(“hi”);
+
+
+7. React lifecycle of Components:- 
+Each react component has 3 stages where we can make changes 1. Mounting 2. Updating 3. Unmounting.
+1. Mounting means putting the component in the dom.componentDidMount() it runs only when the component runs for the first time. it is used to get initialise data or fetch API data.
+2. We use componentDidUpdate() it has prev states as an argument. so it renders whenever the arguments value changes.
+3. componentWillUnmount() runs whenever we remove that component from the code.
+        For the functional component you can use useffect() hook 
+1.  useffect(()=>{
+        console.log(“component mounted”)
+},[])
+
+
+2. useffect((number)=>{
+        console.log(“component updated”);
+},[number])
+
+
+3. useffect((number)=>{
+        console.log(“component updated”);
+        if(number===5){
+Return ()=>{
+console.log(component unmounted )
+}}},[number])
+8. What is virtual dom:- 
+It is a javascript object which is a corresponding copy of real dom. It has a node tree with elements and attributes. less memory and very high execution speed. As the DOM is represented with a tree structure, querying and updating is usually faster than rendering. However, it may also be costly if we have to traverse a good portion of the DOM tree to find the node to update.
+
+
+9. Are props immutable? If yes, why?
+Yes because all they are read-only variables and they act like arguments passed through function. And it is passed through multiple components.
+
+
+10. How to pass data from parent to child and child to parent?
+From parent to child we will use props 
+From child to parent we will create a callback function in the parent and will pass this function as a prop to the child and then in a child will pass the arguments as a value
+
+
+11. What is a fragment? What is div-soup? The disadvantage of div soup and how fragments solve it:- 
+React Fragments allow you to wrap or group multiple elements without adding an extra node to the DOM. With div, you can wrap multiple elements but it is not feasible to create extra dom each time.
+
+
+12. What are a class-based and function-based component? 
+a functional component is just a plain JavaScript function that returns JSX. A class component is a JavaScript class that extends React. Component
+
+
+13. Is there something that you can only do with class-based components and not functional components?
+In class components, the render method will be called, whenever the state of the components changes. On the other hand, the Functional components render the UI based on the props. Class Components should be preferred whenever we have a requirement with the state of the component.
+
+
+14. What are error boundaries?
+React components that catch JavaScript errors anywhere in their child component tree, log those errors, and display a fallback UI instead of the component tree that crashed
+
+
+15. What are controlled and uncontrolled components?
+In a controlled component, form data is handled by a React component. The alternative is uncontrolled components, where form data is handled by the DOM itself
+
+
+16. What is prop-drilling?
+Prop drilling is a situation where data is passed from one component through multiple interdependent components until you get to the component where the data is needed.
+
+
+17. What is context API? the downside of context API?
+It is a built-in react tool. doesn't make any changes to the final bundle size. Don't have boilerplate more
+Downside:- UI and state management in the same component. debugging will be hard in the nested react components.
+
+
+   18. useState hook:- 
+It is used for state management. it helps you state without class.
+ const [count, setCount] = useState(0);
+
+
+      19. useEffect hook:- 
+It is used to perform side hooks in react components.
+
+
+      20. useRef hook:- 
+The useRef Hook allows you to persist values between renders.
+It can be used to store a mutable value that does not cause a re-render when updated.
+It can be used to access a DOM element directly.
+
+
+      21. How to optimize react performance?
+Use immutable data structure, create pure component(have the same op for same props and state). create multiple chunk files. try to use react. fragments.memoize react component
+
+
+      22. Write the order of console 
+console.log('script start'); --------1
+setTimeout(function () {
+  console.log('setTimeout'); --------2
+}, 0);
+Promise.resolve()
+  .then(function () {
+    console.log('promise1'); --------3
+  })
+  .then(function () {
+    console.log('promise2'); --------4
+  });
+console.log('script end'); --------5
+Ans:- 1,5 both will work directly because they get executed in the console but promises go to the microtask queue so then 3,4 will console. And timeout works there is no pending task in microtask queue so timeout will execute last 
+
+
+
+
+
+
+
+
+      23.  Output of the code:- 
+
+
+var temp= [1,2,3];
+((x)=>{
+x.push(55);
+console.log(x);
+x=[3,2,1];
+x.push(44);
+console.log(x);
+})(temp)
+console.log(temp);
+:-  in js array has assigned by reference so here only x value get refranced 
+
+
+
+
+      24. Working of this in regular js function and arrow function -
+var variable = “Global Level Variable”;
+let myObject = { 
+ variable: “Object Level Variable”, 
+arrowFunction:() => { 
+ console.log(this.variable); 
+ },
+regularFunction(){ 
+ console.log(this.variable); 
+ } 
+};
+myObject.arrowFunction(); 
+myObject.regularFunction();
+
+
+Op:-
+Global Level Variable
+Object Level Variable 
+
+Explanation:- arrow function doesn't have their own this they try to find their this in lexical scope so they don't redefine this in the function but regular function have their own this so they can redefine value 
+
+
+      25. Using filter remove duplicate from array:- 
+let a = [1,2,3,2,1,3,4,5,6]
+
+
+let  b = a.filter((ele , i, a)=> a.indexOf(ele)===i);
+Index of gives an index of the first occurrence
+
+
+
+
+         26.          27.
