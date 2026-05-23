@@ -1,236 +1,556 @@
-Frontend interview questions
+# Frontend Interview Questions
 
+---
 
-1. Diff between map and foreach - both are array functions to loop through array function map doesn't harm the original array it creates a separate array by performing the operation but foreach makes changes to the original array. And as the map creates another array so we can chain other functions to map like a filter, reduce etc.
-eg. const ans = arr.map((e)=>{
-Return e+2;
+## Q1: Diff between map and foreach
+**Key Difference:** `map()` creates a new array and doesn't modify the original, while `forEach()` iterates but doesn't return anything.
+
+```javascript
+const ans = arr.map((e) => {
+  return e + 2;  // Returns new array
 })
-Const foreach = arr.foreach((e)=>{
-Return e+2;
+
+arr.forEach((e) => {
+  return e + 2;  // Returns undefined, doesn't create new array
 })
+```
 
+---
 
-2. Diff between null and undefined:- as null is the value(type -object) and undefined is the value declared but not initialised.
-(null == undefined) = true[it check only value]
-(null===undefined) = false[it chack value as well as type]
+## Q2: Diff between null and undefined
+- **null**: Intentionally assigned value (type: object)
+- **undefined**: Variable declared but not initialized
 
+```javascript
+(null == undefined)   // true  (checks only value)
+(null === undefined)  // false (checks value and type)
+```
 
-3. Flatten the array:- let arr = [ [1,2], [4,3,2],[8,9,0] ] for single depth we can do
-[].concat(...arr). I will give the array. [].flat(depth of array);For multilevel [].flat(Infinity).
+---
 
+## Q3: Flatten the array
+**Single depth:**
+```javascript
+let arr = [[1,2], [4,3,2], [8,9,0]];
+[].concat(...arr)  // [1, 2, 4, 3, 2, 8, 9, 0]
+```
 
-4. Let vs const vs var:- var is globally scoped and let const are block scoped. you can redeclare var but not const and let.
+**Multiple levels:**
+```javascript
+arr.flat(Infinity)  // Flattens all levels
+```
 
+---
 
-5. setTimeout related:-
-function temp (){
-for(let i =0;i<5;i++){
-setTimeout( function a(){
-console.log(i);
-},i*1000)
+## Q4: Let vs const vs var
+| Keyword | Scope | Redeclarable | Reassignable |
+|---------|-------|--------------|--------------|
+| var | Global | Yes | Yes |
+| let | Block | No | Yes |
+| const | Block | No | No |
+
+---
+
+## Q5: setTimeout related - Closure Issue
+**With `let` (Block Scoped):**
+```javascript
+function temp() {
+  for(let i = 0; i < 5; i++) {
+    setTimeout(function a() {
+      console.log(i);  // Output: 0, 1, 2, 3, 4
+    }, i * 1000)
+  }
 }
+```
+
+**With `var` (Global Scoped):**
+```javascript
+function temp() {
+  for(var i = 0; i < 5; i++) {
+    setTimeout(function a() {
+      console.log(i);  // Output: 5, 5, 5, 5, 5
+    }, i * 1000)
+  }
 }
+```
 
-temp();
-For let = 0,1,2,3,4 for var = 5,5,5,5,5; as let have block scope and var has global scope so it references to global scope value at last.
-
-function temp (){
-for(let i =0;i<5;i++){
-function b(i){
-setTimeout( function a(){
-console.log(i);
-},i*1000)
-} b(i);
+**Fix using IIFE:**
+```javascript
+function temp() {
+  for(var i = 0; i < 5; i++) {
+    (function(i) {
+      setTimeout(function a() {
+        console.log(i);  // Output: 0, 1, 2, 3, 4
+      }, i * 1000)
+    })(i);
+  }
 }
-}
-temp();
-it will print the correct value.
+```
 
+---
 
-6. Explain call, apply and bind:-
+## Q6: Explain call, apply and bind
+
+```javascript
 let person = {
-name: "sammed",
-hello: function (word){
-console.log("welcome " + this.name+ " and "+word);
+  name: "sammed",
+  hello: function(word) {
+    console.log("welcome " + this.name + " and " + word);
+  }
 }
-}
+
 let another = {
-name: "Rakesh"
+  name: "Rakesh"
 }
-We provide the context to reference which it has to take. bind return function after taking the context we can provide the argument for value afterwards.
 
-person.hello.call(another , "hi");
-person.hello.call(another,["hi"]);
-Const temp = person.hello.bind(another);
-temp("hi");
+// Using call() - executes immediately, individual arguments
+person.hello.call(another, "hi");  
+// Output: "welcome Rakesh and hi"
 
+// Using apply() - executes immediately, array of arguments
+person.hello.apply(another, ["hi"]);  
+// Output: "welcome Rakesh and hi"
 
-7. React lifecycle of Components:-
-Each react component has 3 stages where we can make changes 1. Mounting 2. Updating 3. Unmounting.
-1. Mounting means putting the component in the dom.componentDidMount() it runs only when the component runs for the first time. it is used to get initialise data or fetch API data.
-2. We use componentDidUpdate() it has prev states as an argument. so it renders whenever the arguments value changes.
-3. componentWillUnmount() runs whenever we remove that component from the code.
-For the functional component you can use useffect() hook
-1. useffect(()=>{
-console.log("component mounted")
-},[])
+// Using bind() - returns a function, doesn't execute immediately
+const temp = person.hello.bind(another);
+temp("hi");  
+// Output: "welcome Rakesh and hi"
+```
 
-2. useffect((number)=>{
-console.log("component updated");
-},[number])
+---
 
-3. useffect((number)=>{
-console.log("component updated");
-if(number===5){
-Return ()=>{
-console.log(component unmounted )
+## Q7: React Lifecycle of Components
+
+### Class Components
+**1. Mounting (Component added to DOM)**
+```javascript
+componentDidMount() {
+  // Runs once after component mounts
+  // Used to fetch API data or initialize
 }
-}},[number])
+```
 
-8. What is virtual dom:-
-It is a javascript object which is a corresponding copy of real dom. It has a node tree with elements and attributes. less memory and very high execution speed. As the DOM is represented with a tree structure, querying and updating is usually faster than rendering. However, it may also be costly if we have to traverse a good portion of the DOM tree to find the node to update.
+**2. Updating (State/Props change)**
+```javascript
+componentDidUpdate(prevProps, prevState) {
+  // Runs whenever state or props change
+}
+```
 
+**3. Unmounting (Component removed from DOM)**
+```javascript
+componentWillUnmount() {
+  // Runs before component is removed
+  // Used for cleanup
+}
+```
 
-9. Are props immutable? If yes, why?
-Yes because all they are read-only variables and they act like arguments passed through function. And it is passed through multiple components.
+### Functional Components (using Hooks)
+**1. Mounting:**
+```javascript
+useEffect(() => {
+  console.log("Component mounted");
+}, [])  // Empty dependency array = runs once
+```
 
+**2. Updating:**
+```javascript
+useEffect(() => {
+  console.log("Component updated");
+}, [number])  // Runs when 'number' changes
+```
 
-10. How to pass data from parent to child and child to parent?
-From parent to child we will use props
-From child to parent we will create a callback function in the parent and will pass this function as a prop to the child and then in a child will pass the arguments as a value
+**3. Unmounting:**
+```javascript
+useEffect(() => {
+  return () => {
+    console.log("Component unmounted");
+  }
+}, [number])  // Cleanup function runs on unmount
+```
 
+---
 
-11. What is a fragment? What is div-soup? The disadvantage of div soup and how fragments solve it:-
-React Fragments allow you to wrap or group multiple elements without adding an extra node to the DOM. With div, you can wrap multiple elements but it is not feasible to create extra dom each time.
+## Q8: What is Virtual DOM?
+- JavaScript object representation of the real DOM
+- Has a node tree with elements and attributes
+- **Benefits:**
+  - Uses less memory
+  - High execution speed
+  - Improves performance through efficient diffing and batching updates
 
+---
 
-12. What are a class-based and function-based component?
-a functional component is just a plain JavaScript function that returns JSX. A class component is a JavaScript class that extends React. Component
+## Q9: Are props immutable? If yes, why?
+**Yes, props are immutable (read-only).**
 
+**Reasons:**
+- Props act like function arguments
+- Props are passed through multiple components
+- Immutability ensures data integrity across the component tree
+- Prevents accidental modifications to data from parent components
 
-13. Is there something that you can only do with class-based components and not functional components?
-In class components, the render method will be called, whenever the state of the components changes. On the other hand, the Functional components render the UI based on the props. Class Components should be preferred whenever we have a requirement with the state of the component.
+---
 
+## Q10: How to pass data from parent to child and child to parent?
 
-14. What are error boundaries?
-React components that catch JavaScript errors anywhere in their child component tree, log those errors, and display a fallback UI instead of the component tree that crashed
+**Parent to Child (using Props):**
+```javascript
+// Parent
+<Child message="Hello from parent" />
 
+// Child
+function Child(props) {
+  return <p>{props.message}</p>;
+}
+```
 
-15. What are controlled and uncontrolled components?
-In a controlled component, form data is handled by a React component. The alternative is uncontrolled components, where form data is handled by the DOM itself
+**Child to Parent (using Callback Function):**
+```javascript
+// Parent
+function Parent() {
+  const handleChildData = (data) => {
+    console.log("Data from child:", data);
+  }
+  return <Child sendData={handleChildData} />
+}
 
+// Child
+function Child({ sendData }) {
+  return <button onClick={() => sendData("Hi parent")}>Send Data</button>
+}
+```
 
-16. What is prop-drilling?
-Prop drilling is a situation where data is passed from one component through multiple interdependent components until you get to the component where the data is needed.
+---
 
+## Q11: What is a fragment? What is div-soup?
 
-17. What is context API? the downside of context API?
-It is a built-in react tool. doesn't make any changes to the final bundle size. Don't have boilerplate more
-Downside:- UI and state management in the same component. debugging will be hard in the nested react components.
+**Fragment:** React Fragments allow you to wrap multiple elements without adding extra DOM nodes.
 
+**Div-soup:** Using unnecessary `<div>` wrappers for every group of elements.
 
-18. useState hook:-
-It is used for state management. it helps you state without class.
+**Disadvantage of div-soup:**
+- Creates unnecessary DOM nodes
+- Bloats HTML structure
+- Can break CSS layouts
+
+**Solution with Fragments:**
+```javascript
+// Without Fragment (div-soup)
+return (
+  <div>
+    <Component1 />
+    <Component2 />
+  </div>
+)
+
+// With Fragment
+return (
+  <>
+    <Component1 />
+    <Component2 />
+  </>
+)
+```
+
+---
+
+## Q12: Class-based vs Function-based components
+
+| Aspect | Class Component | Function Component |
+|--------|-----------------|-------------------|
+| Definition | Extends React.Component | Plain JavaScript function |
+| State Management | `this.state` | `useState` hook |
+| Lifecycle | `componentDidMount`, etc. | `useEffect` hook |
+| Syntax | More verbose | More concise |
+| Performance | Slightly slower | Slightly faster |
+
+---
+
+## Q13: Can you only do something with class-based components and not functional components?
+
+**Before Hooks:** Yes, only class components had lifecycle methods.
+
+**After Hooks:** Functional components can do almost everything class components can do.
+
+**Minor Differences:**
+- Class components have `render()` method
+- Error boundaries are currently only available in class components
+- `getSnapshotBeforeUpdate()` and `componentDidCatch()` have no functional equivalents yet
+
+---
+
+## Q14: What are error boundaries?
+
+React components that:
+- Catch JavaScript errors in child component tree
+- Log those errors
+- Display fallback UI instead of crashing
+
+```javascript
+class ErrorBoundary extends React.Component {
+  state = { hasError: false };
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    console.log(error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return <h1>Something went wrong</h1>;
+    }
+    return this.props.children;
+  }
+}
+```
+
+---
+
+## Q15: Controlled vs Uncontrolled components
+
+**Controlled Component:** React manages form data through state
+```javascript
+function Form() {
+  const [value, setValue] = useState("");
+  
+  return (
+    <input 
+      value={value} 
+      onChange={(e) => setValue(e.target.value)} 
+    />
+  );
+}
+```
+
+**Uncontrolled Component:** DOM manages form data directly
+```javascript
+function Form() {
+  const inputRef = useRef();
+  
+  return (
+    <input ref={inputRef} />
+  );
+}
+```
+
+---
+
+## Q16: What is prop-drilling?
+
+Prop drilling is passing data from one component through multiple intermediate components until reaching the component that needs it.
+
+**Problem:**
+```javascript
+// Data flows through multiple layers
+<GrandParent data={data} />
+  <Parent data={data} />
+    <Child data={data} />
+      <GrandChild data={data} />  // Only this needs it
+```
+
+**Solution:** Use Context API or State Management (Redux, Zustand)
+
+---
+
+## Q17: What is Context API? Downsides?
+
+**Context API:** Built-in React tool for global state management without prop drilling.
+
+**Advantages:**
+- No increase in bundle size
+- Minimal boilerplate
+
+**Downsides:**
+- UI and state management in same component
+- Difficult debugging in nested components
+- Can cause performance issues with frequent updates
+- Not ideal for frequently changing data
+
+---
+
+## Q18: useState hook
+
+Used for state management in functional components.
+
+```javascript
 const [count, setCount] = useState(0);
 
+return (
+  <>
+    <p>Count: {count}</p>
+    <button onClick={() => setCount(count + 1)}>Increment</button>
+  </>
+);
+```
 
-19. useEffect hook:-
-It is used to perform side hooks in react components.
+---
 
+## Q19: useEffect hook
 
-20. useRef hook:-
-The useRef Hook allows you to persist values between renders.
-It can be used to store a mutable value that does not cause a re-render when updated.
-It can be used to access a DOM element directly.
+Used to perform side effects in React components (fetch data, subscriptions, DOM manipulation).
 
+```javascript
+useEffect(() => {
+  // Side effect code here
+  return () => {
+    // Cleanup code here
+  };
+}, [dependencies]);
+```
 
-21. How to optimize react performance?
-Use immutable data structure, create pure component(have the same op for same props and state). create multiple chunk files. try to use react. fragments.memoize react component
+---
 
+## Q20: useRef hook
 
-22. Write the order of console
-console.log('script start'); --------1
-setTimeout(function () {
-console.log('setTimeout'); --------2
-}, 0);
-Promise.resolve()
-.then(function () {
-console.log('promise1'); --------3
-})
-.then(function () {
-console.log('promise2'); --------4
+The `useRef` Hook allows you to:
+- **Persist values** between renders without causing re-renders
+- **Store mutable values** that don't trigger updates
+- **Access DOM elements** directly
+
+```javascript
+const inputRef = useRef();
+
+const focusInput = () => {
+  inputRef.current.focus();
+}
+
+return (
+  <>
+    <input ref={inputRef} />
+    <button onClick={focusInput}>Focus Input</button>
+  </>
+);
+```
+
+---
+
+## Q21: How to optimize React performance?
+
+1. **Use immutable data structures** - Prevents accidental mutations
+2. **Create pure components** - Same output for same props/state
+3. **Code splitting** - Break into multiple chunk files
+4. **React.memo** - Memoize components to prevent unnecessary re-renders
+5. **Use Fragments** - Avoid unnecessary DOM nodes
+6. **Lazy loading** - Load components on demand
+
+```javascript
+// Using React.memo
+const MyComponent = React.memo(function Component(props) {
+  return <div>{props.name}</div>;
 });
-console.log('script end'); --------5
-Ans:- 1,5 both will work directly because they get executed in the console but promises go to the microtask queue so then 3,4 will console. And timeout works there is no pending task in microtask queue so timeout will execute last
+```
 
+---
 
+## Q22: Write the order of console
 
-23. Output of the code:- Array Reference Behavior
+```javascript
+console.log('script start');      // 1 - Synchronous
 
+setTimeout(function() {
+  console.log('setTimeout');      // 4 - Macrotask
+}, 0);
+
+Promise.resolve()
+  .then(function() {
+    console.log('promise1');      // 2 - Microtask
+  })
+  .then(function() {
+    console.log('promise2');      // 3 - Microtask
+  });
+
+console.log('script end');        // 1 - Synchronous
+
+// Output Order:
+// 1. script start
+// 2. script end
+// 3. promise1
+// 4. promise2
+// 5. setTimeout
+```
+
+**Explanation:** Synchronous → Microtasks (Promises) → Macrotasks (setTimeout)
+
+---
+
+## Q23: Output of the code - Array Reference Behavior
+
+```javascript
 var temp = [1, 2, 3];
 
 ((x) => {
   x.push(55);
-  console.log(x);
+  console.log(x);      // [1, 2, 3, 55]
+  
   x = [3, 2, 1];
   x.push(44);
-  console.log(x);
+  console.log(x);      // [3, 2, 1, 44]
 })(temp)
 
-console.log(temp);
+console.log(temp);     // [1, 2, 3, 55]
+```
 
-EXPLANATION:
-In JavaScript, arrays are assigned by reference. In this code, the variable x receives
-a reference to the temp array. When x.push(55) is called, it modifies the original array.
-However, when x = [3, 2, 1] is executed, x is reassigned to a new array, and x no longer
-references temp. Therefore, the final console.log(temp) shows only the first push.
+**Explanation:**
+- Arrays are assigned by reference
+- `x` initially references `temp`
+- `x.push(55)` modifies the original array
+- `x = [3, 2, 1]` reassigns `x` to a NEW array (no longer references `temp`)
+- Final `console.log(temp)` shows only the first push
 
+---
 
-24. 'this' in Regular JS Function vs Arrow Function
+## Q24: 'this' in Regular JS Function vs Arrow Function
 
+```javascript
 var variable = "Global Level Variable";
 
 let myObject = {
   variable: "Object Level Variable",
   arrowFunction: () => {
-    console.log(this.variable);
+    console.log(this.variable);      // "Global Level Variable"
   },
   regularFunction() {
-    console.log(this.variable);
+    console.log(this.variable);      // "Object Level Variable"
   }
 };
 
-myObject.arrowFunction();      // Output: Global Level Variable
-myObject.regularFunction();    // Output: Object Level Variable
+myObject.arrowFunction();
+myObject.regularFunction();
+```
 
-EXPLANATION:
-- Arrow Functions: Don't have their own 'this' context. They inherit 'this' from the
-  lexical scope (surrounding context). Here, 'this' refers to the global object.
+**Explanation:**
+- **Arrow Functions:** No own `this` context; inherit from lexical scope (global)
+- **Regular Functions:** Own `this` context; bound to calling object
 
-- Regular Functions: Have their own 'this' context, which is bound to the object that
-  calls them. Here, 'this' refers to myObject.
+---
 
+## Q25: Using filter() to Remove Duplicates from Array
 
-25. Using filter() to Remove Duplicates from Array
-
+```javascript
 let a = [1, 2, 3, 2, 1, 3, 4, 5, 6];
-let b = a.filter((ele, i, a) => a.indexOf(ele) === i);
+let b = a.filter((ele, i, arr) => arr.indexOf(ele) === i);
 
-Result: [1, 2, 3, 4, 5, 6]
+// Result: [1, 2, 3, 4, 5, 6]
+```
 
-EXPLANATION:
-The indexOf() method returns the index of the first occurrence of an element.
-By comparing i (current index) with indexOf(ele) (first occurrence index), we keep
-only elements appearing for the first time, effectively removing duplicates.
+**Explanation:**
+- `indexOf()` returns the index of the FIRST occurrence
+- Compare current index `i` with `indexOf(ele)`
+- Keep only elements appearing for the first time
+- Effectively removes duplicates
 
+---
 
-26. Explain call(), apply(), and bind()
+## Q26: Explain call(), apply(), and bind()
 
-JavaScript's call(), apply(), and bind() methods control the 'this' context of functions
-and allow method borrowing between objects.
+JavaScript methods to control the `this` context and enable method borrowing.
 
-USING call():
-
+### Using call()
+```javascript
 const student1 = {
   name: "sammed",
   callName: function() {
@@ -238,19 +558,17 @@ const student1 = {
   }
 };
 
-student1.callName();  // Output: "sammed"
-
 const student2 = {
   name: "shrey"
 };
 
 student1.callName.call(student2);  // Output: "shrey"
+```
+- Invokes function immediately
+- Sets `this` to the provided object
 
-The call() method invokes the function immediately with 'this' set to student2.
-
-
-USING apply():
-
+### Using apply()
+```javascript
 const student1 = {
   name: "sammed",
   greet: function(message, time) {
@@ -264,13 +582,12 @@ const student2 = {
 
 student1.greet.apply(student2, ["Hello", "morning"]);
 // Output: "Hello, shrey! It's morning"
+```
+- Like `call()` but accepts arguments as an array
+- Useful for arrays of arguments
 
-apply() is like call() but accepts arguments as an array.
-Useful when you have arguments in an array format.
-
-
-USING bind():
-
+### Using bind()
+```javascript
 const student1 = {
   name: "sammed",
   greet: function(message, time) {
@@ -282,24 +599,26 @@ const student2 = {
   name: "shrey"
 };
 
-// Partial binding - first argument pre-filled
+// Partial binding
 const boundGreet = student1.greet.bind(student2, "Hi");
 boundGreet("evening");  // Output: "Hi, shrey! It's evening"
 
-// Fully bound function
+// Fully bound
 const fullyBound = student1.greet.bind(student2, "Hello", "night");
 fullyBound();  // Output: "Hello, shrey! It's night"
+```
+- Creates a new function without executing immediately
+- Returns a function that can be called later
+- Allows partial application (pre-filling arguments)
 
-bind() creates a new function without executing it immediately.
-Returns a function that can be called later.
-Allows partial application (pre-filling some arguments).
+### Key Differences
 
+| Method | Executes Immediately | Arguments Format | Returns |
+|--------|----------------------|------------------|---------|
+| **call()** | Yes | Individual args | Function result |
+| **apply()** | Yes | Array | Function result |
+| **bind()** | No | Individual args | New bound function |
 
-KEY DIFFERENCES:
+---
 
-Method    | Executes Immediately | Arguments Format | Returns
-call()    | Yes                  | Individual args  | Function result
-apply()   | Yes                  | Array            | Function result
-bind()    | No (returns func)    | Individual args  | New bound function
-
-These methods enable powerful function borrowing and flexible 'this' binding - essential for advanced JavaScript patterns.
+**These methods enable powerful function borrowing and flexible 'this' binding - essential for advanced JavaScript patterns.**
