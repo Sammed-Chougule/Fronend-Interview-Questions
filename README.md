@@ -1,5 +1,6 @@
 # Fronend-Interview-Questions
 
+⭐ **If you find this helpful, please star this repository to stay updated with more interview questions!**
 
 ---
 
